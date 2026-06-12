@@ -9,3 +9,14 @@ Project Goal--
 * Extract action items and assigned tasks
 * Identify and highlight key decisions made during the meeting
 * Organize and structure the meeting transcript for easy review and follow-up
+
+
+
+
+
+
+
+
+In app.js
+line no. 255
+please enter your openai api key
