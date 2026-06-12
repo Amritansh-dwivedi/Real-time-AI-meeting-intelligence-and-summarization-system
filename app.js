@@ -252,7 +252,7 @@
     async function processMeeting() {
         // Validate
         const apiKey = DOM.apiKey.value.trim();
-        if (!apiKey) { showToast('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', 'error'); return; }
+        if (!apiKey) { showToast('Enter openai apli key', 'error'); return; }
 
         const rawTranscript = DOM.transcriptInput.value.trim();
         if (!rawTranscript) { showToast('Please paste a meeting transcript.', 'error'); return; }
