@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered Meeting Intelligence Dashboard — Transform meeting transcripts into actionable insights with speaker analysis, sentiment detection, and automated summaries.">
+    <title>Meeting Intelligence Dashboard — AI-Powered Analysis</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🧠</text></svg>">
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="logo-group">
+                <div class="logo-icon">🧠</div>
+                <div>
+                    <div class="logo-text">Meeting Intelligence</div>
+                </div>
+                <span class="logo-badge">AI Powered</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost" id="btn-theme" title="Toggle theme">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN LAYOUT ===== -->
+    <main class="app-container">
+
+        <!-- ===== INPUT PANEL ===== -->
+        <aside class="input-panel" id="input-panel">
+
+            <!-- API Key -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon cyan">🔑</div>
+                    <div>
+                        <div class="card-title">OpenAI Configuration</div>
+                        <div class="card-subtitle">API key for GPT processing</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="api-key">API Key <span class="required">*</span></label>
+                    <input type="password" class="form-input" id="api-key" placeholder="sk-proj-..." />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="model-select">Model</label>
+                    <select class="form-select" id="model-select">
+                        <option value="gpt-4o-mini" selected>GPT-4o Mini (Fast & Affordable)</option>
+                        <option value="gpt-4o">GPT-4o (Best Quality)</option>
+                        <option value="gpt-4.1-mini">GPT-4.1 Mini</option>
+                        <option value="gpt-4.1">GPT-4.1</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Meeting Metadata -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">📋</div>
+                    <div>
+                        <div class="card-title">Meeting Metadata</div>
+                        <div class="card-subtitle">Optional meeting details</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="meeting-title">Meeting Title</label>
+                    <input type="text" class="form-input" id="meeting-title" placeholder="e.g. Q3 Product Sprint Review" />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="meeting-date">Date</label>
+                        <input type="date" class="form-input" id="meeting-date" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="meeting-duration">Duration</label>
+                        <input type="text" class="form-input" id="meeting-duration" placeholder="e.g. 45 min" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="participants">Participants (name mapping)</label>
+                    <input type="text" class="form-input" id="participants" placeholder="SPEAKER_00=Alice, SPEAKER_01=Bob" />
+                    <div class="form-hint">Map diarization labels to real names</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="language-select">Original Language <span class="required">*</span></label>
+                    <select class="form-select" id="language-select">
+                        <option value="auto" selected>Auto-Detect</option>
+                        <option value="english">English</option>
+                        <option value="hindi">Hindi</option>
+                        <option value="hinglish">Hinglish (Hindi + English)</option>
+                        <option value="mixed">Mixed / Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Audio Upload -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon yellow">🎤</div>
+                    <div>
+                        <div class="card-title">Audio Upload</div>
+                        <div class="card-subtitle">Upload audio to auto-transcribe with Whisper</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="upload-zone" id="upload-zone">
+                        <input type="file" id="audio-file-input" accept="audio/*,video/mp4,video/webm,.mp3,.wav,.m4a,.ogg,.flac,.webm,.mp4" hidden />
+                        <div class="upload-zone-content" id="upload-zone-content">
+                            <div class="upload-zone-icon">🎵</div>
+                            <div class="upload-zone-title">Drop audio file here</div>
+                            <div class="upload-zone-text">or <span class="upload-browse-link">browse files</span></div>
+                            <div class="upload-zone-formats">MP3, WAV, M4A, OGG, FLAC, WEBM, MP4 · Max 25 MB</div>
+                        </div>
+                    </div>
+                    <!-- File Info (shown after selection) -->
+                    <div class="upload-file-info" id="upload-file-info" style="display:none;">
+                        <div class="upload-file-details">
+                            <span class="upload-file-icon">🎵</span>
+                            <div class="upload-file-meta">
+                                <div class="upload-file-name" id="upload-file-name">filename.mp3</div>
+                                <div class="upload-file-size" id="upload-file-size">0 MB</div>
+                            </div>
+                            <button class="btn btn-ghost btn-sm" id="btn-remove-file" title="Remove file">✕</button>
+                        </div>
+                    </div>
+                    <!-- Transcription Progress -->
+                    <div class="upload-progress-section" id="upload-progress-section" style="display:none;">
+                        <div class="upload-progress-label" id="upload-progress-label">Transcribing audio...</div>
+                        <div class="upload-progress-bar-track">
+                            <div class="upload-progress-bar-fill" id="upload-progress-bar-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-full btn-sm" id="btn-transcribe" style="display:none;">
+                    🎙️ Transcribe with Whisper
+                </button>
+                <div class="form-hint" style="margin-top:8px;">
+                    ⓘ Whisper transcribes speech but does not identify individual speakers. All text will be labeled as SPEAKER_00.
+                </div>
+            </div>
+
+            <!-- Transcript Input -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📝</div>
+                    <div>
+                        <div class="card-title">Transcript Input</div>
+                        <div class="card-subtitle">Paste cleaned transcript or auto-filled from audio</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="transcript-input">Meeting Transcript <span class="required">*</span></label>
+                    <textarea class="form-textarea tall" id="transcript-input" placeholder="[00:00:05] SPEAKER_00: Hello everyone, welcome to the meeting...&#10;[00:00:12] SPEAKER_01: Thanks for having us. Let's get started...&#10;&#10;💡 Or upload an audio file above to auto-transcribe."></textarea>
+                    <div class="form-hint">Format: [HH:MM:SS] SPEAKER_XX: Text...</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="btn-group" style="flex-direction: column; gap: 8px;">
+                <button class="btn btn-primary btn-full" id="btn-process">
+                    🚀 Process Meeting
+                </button>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" id="btn-sample" style="flex:1">
+                        📄 Load Sample
+                    </button>
+                    <button class="btn btn-secondary" id="btn-clear" style="flex:1">
+                        🗑️ Clear
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ===== OUTPUT PANEL ===== -->
+        <section class="output-panel" id="output-panel">
+
+            <!-- Empty State -->
+            <div class="output-empty" id="output-empty">
+                <div class="empty-icon">🎙️</div>
+                <div class="empty-title">Ready to Analyze</div>
+                <div class="empty-text">
+                    Paste your meeting transcript on the left and click
+                    <strong>"Process Meeting"</strong> to generate comprehensive intelligence.
+                </div>
+                <button class="btn btn-secondary" id="btn-sample-alt">
+                    Or load sample data to try it out →
+                </button>
+            </div>
+
+            <!-- Output content injected dynamically by app.js -->
+            <div id="output-content" style="display: none;"></div>
+
+        </section>
+    </main>
+
+    <!-- ===== PROCESSING OVERLAY ===== -->
+    <div class="processing-overlay" id="processing-overlay">
+        <div class="processing-card">
+            <div class="processing-spinner"></div>
+            <div class="processing-title">Analyzing Meeting</div>
+            <div class="processing-step" id="processing-step-text">Initializing...</div>
+            <div class="processing-progress">
+                <div class="processing-progress-bar" id="processing-progress-bar"></div>
+            </div>
+            <div class="processing-steps-list" id="processing-steps-list">
+                <div class="step-item" data-step="1"><span class="step-icon">○</span> Transcript Validation & Cleaning</div>
+                <div class="step-item" data-step="2"><span class="step-icon">○</span> Speaker Mapping</div>
+                <div class="step-item" data-step="3"><span class="step-icon">○</span> Language Detection & Translation</div>
+                <div class="step-item" data-step="4"><span class="step-icon">○</span> Structured Transcript</div>
+                <div class="step-item" data-step="5"><span class="step-icon">○</span> Executive Summary</div>
+                <div class="step-item" data-step="6"><span class="step-icon">○</span> Action Items Extraction</div>
+                <div class="step-item" data-step="7"><span class="step-icon">○</span> Speaker Analysis</div>
+                <div class="step-item" data-step="8"><span class="step-icon">○</span> Sentiment Analysis</div>
+                <div class="step-item" data-step="9"><span class="step-icon">○</span> Final Output Assembly</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
