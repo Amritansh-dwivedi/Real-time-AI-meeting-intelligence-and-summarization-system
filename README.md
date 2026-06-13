@@ -17,6 +17,3 @@ Project Goal--
 
 
 
-In app.js,,,
-line no. 255,,,,,
-please enter your openai api key
