@@ -252,7 +252,7 @@
     async function processMeeting() {
         // Validate
         const apiKey = DOM.apiKey.value.trim();
-        if (!apiKey) { showToast('Enter Your API Key', 'error'); return; }
+        if (!apiKey) { showToast("Enter Your API Key", 'error'); return; }
 
         const rawTranscript = DOM.transcriptInput.value.trim();
         if (!rawTranscript) { showToast('Please paste a meeting transcript.', 'error'); return; }
